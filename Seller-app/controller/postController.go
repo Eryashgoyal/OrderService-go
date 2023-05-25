@@ -46,10 +46,44 @@ func PostCreate(c *gin*Context){
 }
 
 func ListOrder(c *gin*Context){
-    var orders []models.Order
-	initializers.DB.Find(&orders)
+//     var orders []models.Order
+// 	initializers.DB.Find(&orders)
 
 	
+// 	c.JSON(200,gin.H{
+// 		"list of orders " : orders,
+// 	})	
+	var orders []models.Order
+	id := ctx.Query("id")
+	status := ctx.Query("status")
+	total := ctx.Query("total")
+	currencyUnit := ctx.Query("currency_unit")
+	orderby := ctx.Query("order_by")
+	sortOrder := ctx.Query("sort_order")
+	db := initializers.DB
+	filterMap := make(map[string]interface{})
+
+	if id!=""{
+		filterMap["id"]=id
+	}
+	if status!=""{
+		filterMap["status"]=status
+	}
+	if total!=""{
+		filterMap["total"]=total
+	}
+	if currencyUnit!=""{
+		filterMap["currencyUnit"]=currencyUnit
+	}
+	
+	db = db.Where(filterMap)
+	
+	if orderby != "" && sortOrder != "" {
+		db = db.Order(orderby + " " + sortOrder)
+	}
+	
+	db.Find(&orders)
+
 	c.JSON(200,gin.H{
 		"list of orders " : orders,
 	})
